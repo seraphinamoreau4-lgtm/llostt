@@ -15,9 +15,11 @@ async function migrate() {
   
   try {
     const schemaPath = path.join(__dirname, '../../../database/schema.sql');
-    const schema = fs.readFileSync(schemaPath, 'utf8');
+    let schema = fs.readFileSync(schemaPath, 'utf8');
 
-    // Construct DATABASE_URL from individual Postgres env vars if needed (Render provides these)
+    const isPostgresUrl = (url) => url && /^(postgres|postgresql):\/\//i.test(url);
+
+    // Construct DATABASE_URL from individual PostgreSQL env vars if needed (Render provides these)
     if (!databaseUrl) {
       const pgHost = process.env.PGHOST;
       const pgPort = process.env.PGPORT || 5432;
@@ -31,7 +33,16 @@ async function migrate() {
       }
     }
 
-    if (databaseUrl && databaseUrl.startsWith('postgresql://')) {
+    const isPostgres = isPostgresUrl(databaseUrl);
+    if (isPostgres) {
+      schema = schema.replace(/INTEGER PRIMARY KEY AUTOINCREMENT/g, 'SERIAL PRIMARY KEY');
+      schema = schema.replace(/\bDATETIME\b/g, 'TIMESTAMP');
+      schema = schema.replace(/INSERT INTO ([\w_]+) \(([^)]+)\) VALUES([\s\S]*?);/g, (match, table, cols, values) => {
+        return `INSERT INTO ${table} (${cols}) VALUES${values} ON CONFLICT DO NOTHING;`;
+      });
+    }
+
+    if (databaseUrl && isPostgres) {
       // PostgreSQL migration
       console.log('🔄 Running PostgreSQL migrations...');
       
