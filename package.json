@@ -1,5 +1,10 @@
 {
   "devDependencies": {
     "nodeman": "^1.1.2"
+  },
+  "scripts": {
+    "build": "npm run build --prefix frontend && npm run migrate --prefix backend",
+    "migrate": "npm run migrate --prefix backend",
+    "start": "npm start --prefix backend"
   }
 }

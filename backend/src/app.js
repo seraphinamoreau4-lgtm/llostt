@@ -78,6 +78,9 @@ app.use('/api', rateLimit({
 // Static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Static files (frontend)
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
 // ─── API ROUTES ───────────────────────────────────────────────
 app.use('/api', routes);
 
@@ -93,7 +96,11 @@ app.get('/health', (req, res) => {
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+    res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+  } else {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  }
 });
 
 // Error handler

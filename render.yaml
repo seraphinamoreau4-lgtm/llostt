@@ -1,20 +1,22 @@
 services:
   - type: web
     name: laikipia-lost-found-backend
-    runtime: node
-    buildCommand: npm ci && npm run migrate
-    startCommand: npm start
+    env: node
+    buildCommand: npm install
+    startCommand: node src/app.js
     envVars:
       - key: NODE_ENV
         value: production
+
       - key: JWT_SECRET
         generateValue: true
+
       - key: ANTHROPIC_API_KEY
         sync: false
+
       - key: FRONTEND_URL
         value: https://laikipia-lost-found.vercel.app
-      - key: PORT
-        value: "5000"
+
       - key: DATABASE_URL
         fromDatabase:
           name: laikipia-db
@@ -22,8 +24,6 @@ services:
 
 databases:
   - name: laikipia-db
-    engine: postgres
-    version: "15"
     plan: free
     databaseName: laikipia_lost_found
     user: postgres
