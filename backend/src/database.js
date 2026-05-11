@@ -64,7 +64,7 @@ async function initDatabase() {
     }
   } else {
     // Development: Try PostgreSQL first if DATABASE_URL is set
-    if (databaseUrl && databaseUrl.startsWith('postgresql://')) {
+    if (databaseUrl && /^(postgres|postgresql):\/\//i.test(databaseUrl)) {
       console.log('🔄 Initializing PostgreSQL connection...');
 
       pool = new Pool({
