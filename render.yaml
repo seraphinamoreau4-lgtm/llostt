@@ -2,8 +2,9 @@ services:
   - type: web
     name: laikipia-lost-found-backend
     env: node
-    buildCommand: npm install
-    startCommand: node src/app.js
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+
     envVars:
       - key: NODE_ENV
         value: production
@@ -26,4 +27,3 @@ databases:
   - name: laikipia-db
     plan: free
     databaseName: laikipia_lost_found
-    user: postgres
